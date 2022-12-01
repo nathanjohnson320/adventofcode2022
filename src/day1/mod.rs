@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 pub fn part1() {
-    let mut elf_index: i64 = 0;
+    let mut elf_index = 0;
     let mut elf_calories: HashMap<i64, Vec<i64>> = HashMap::new();
     elf_calories.insert(elf_index, Vec::new());
 
@@ -22,19 +22,15 @@ pub fn part1() {
         elf_calories.get_mut(&elf_index).unwrap().push(calories);
     }
 
-    let mut max = 0;
-    for (_elf, balances) in elf_calories.iter() {
-        let sum: i64 = balances.iter().sum();
-        if sum > max {
-            max = sum;
-        }
-    }
+    let sums = elf_calories
+        .iter()
+        .map(|(_elf, balances)| balances.iter().sum::<i64>());
 
-    println!("Part1 Max: {}", max);
+    println!("Part1 Max: {:?}", sums.into_iter().max());
 }
 
 pub fn part2() {
-    let mut elf_index: i64 = 0;
+    let mut elf_index = 0;
     let mut elf_calories: HashMap<i64, Vec<i64>> = HashMap::new();
     elf_calories.insert(elf_index, Vec::new());
 
@@ -53,12 +49,13 @@ pub fn part2() {
         elf_calories.get_mut(&elf_index).unwrap().push(calories);
     }
 
-    let mut sums = Vec::new();
-    for (_elf, balances) in elf_calories.iter() {
-        let sum: i64 = balances.iter().sum();
-        sums.push(sum);
-    }
+    let mut sums = elf_calories
+        .iter()
+        .map(|(_elf, balances)| balances.iter().sum::<i64>())
+        .collect::<Vec<i64>>();
     sums.sort();
+
     let sum: i64 = sums.iter().rev().take(3).sum();
-    println!("Part1 Max: {}", sum);
+
+    println!("Part2 Max: {}", sum);
 }
