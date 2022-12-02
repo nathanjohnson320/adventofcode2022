@@ -1,6 +1,4 @@
-use self::Play::PAPER;
-use self::Play::ROCK;
-use self::Play::SCISSORS;
+use self::Play::{PAPER, ROCK, SCISSORS};
 use std::str::FromStr;
 
 #[derive(Debug, PartialEq)]
