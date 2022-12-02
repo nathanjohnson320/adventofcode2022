@@ -8,6 +8,16 @@ enum Play {
     SCISSORS,
 }
 
+impl Play {
+    fn to_score(&self) -> i32 {
+        match *self {
+            ROCK => 1,
+            PAPER => 2,
+            SCISSORS => 3,
+        }
+    }
+}
+
 impl FromStr for Play {
     type Err = ();
     fn from_str(input: &str) -> Result<Play, Self::Err> {
@@ -43,7 +53,7 @@ fn calculate_score(row: &Vec<Play>) -> i32 {
 
     // draws are 3
     if you == them {
-        return 3 + play_to_score(you);
+        return 3 + you.to_score();
     }
 
     let choices = [ROCK, PAPER, SCISSORS];
@@ -51,24 +61,16 @@ fn calculate_score(row: &Vec<Play>) -> i32 {
     let you_index = choices.iter().position(|x| x == you).unwrap();
 
     if them_index == choices.len() - 1 && you_index == 0 {
-        return 6 + play_to_score(you);
+        return 6 + you.to_score();
     }
 
     if you_index == choices.len() - 1 && them_index == 0 {
-        return play_to_score(you);
+        return you.to_score();
     }
     if them_index > you_index {
-        return play_to_score(you);
+        return you.to_score();
     } else {
-        return 6 + play_to_score(you);
-    }
-}
-
-fn play_to_score(play: &Play) -> i32 {
-    match play {
-        ROCK => 1,
-        PAPER => 2,
-        SCISSORS => 3,
+        return 6 + you.to_score();
     }
 }
 
