@@ -2,11 +2,10 @@ mod menu;
 mod files;
 mod day1;
 mod day2;
+mod day3;
 
 use bevy::{prelude::*, winit::WinitSettings};
-use menu::MainMenuPlugin;
-use day1::Day1Plugin;
-use day2::Day2Plugin;
+
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub enum GameState {
@@ -50,9 +49,10 @@ fn main() {
         .add_startup_system(spawn_camera)
         .add_state(GameState::Menu)
         .insert_resource(WinitSettings::desktop_app())
-        .add_plugin(MainMenuPlugin)
-        .add_plugin(Day1Plugin)
-        .add_plugin(Day2Plugin)
+        .add_plugin(menu::MainMenuPlugin)
+        .add_plugin(day1::Day1Plugin)
+        .add_plugin(day2::Day2Plugin)
+        .add_plugin(day3::Day3Plugin)
         .run();
 }
 
