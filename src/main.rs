@@ -3,6 +3,7 @@ mod files;
 mod day1;
 mod day2;
 mod day3;
+mod day4;
 
 use bevy::{prelude::*, winit::WinitSettings};
 
@@ -53,6 +54,7 @@ fn main() {
         .add_plugin(day1::Day1Plugin)
         .add_plugin(day2::Day2Plugin)
         .add_plugin(day3::Day3Plugin)
+        .add_plugin(day4::Day4Plugin)
         .run();
 }
 
