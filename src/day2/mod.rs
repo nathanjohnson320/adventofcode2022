@@ -6,9 +6,6 @@ use bevy::prelude::*;
 
 pub struct Day2Plugin;
 
-#[derive(Component)]
-pub struct ButtonActive(bool);
-
 impl Plugin for Day2Plugin {
     fn build(&self, app: &mut App) {
         app.add_system_set(SystemSet::on_enter(GameState::Day2).with_system(setup_day))

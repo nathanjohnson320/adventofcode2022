@@ -3,9 +3,6 @@ use bevy::prelude::*;
 
 pub struct MainMenuPlugin;
 
-#[derive(Component)]
-pub struct ButtonActive(bool);
-
 impl Plugin for MainMenuPlugin {
     fn build(&self, app: &mut App) {
         app.add_system_set(SystemSet::on_enter(GameState::Menu).with_system(setup_menu))
