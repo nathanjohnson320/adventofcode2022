@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
-use bevy::prelude::*;
 use crate::GameState;
+use bevy::prelude::*;
 
 pub struct Day1Plugin;
 
@@ -30,75 +30,77 @@ fn day1(
             Interaction::Clicked => {
                 state.set(GameState::Menu).unwrap();
             }
-            Interaction::Hovered => {
-            }
-            Interaction::None => {
-            }
+            Interaction::Hovered => {}
+            Interaction::None => {}
         }
     }
 }
 
 fn setup_day1(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn(NodeBundle {
-        style: Style {
-            size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
-            flex_direction: FlexDirection::Column,
-            ..default()
-        },
-        ..default()
-    }).with_children(|body| {
-        body.spawn(NodeBundle {
+    commands
+        .spawn(NodeBundle {
             style: Style {
-                justify_content: JustifyContent::Center,
-                size: Size::new(Val::Auto, Val::Px(30.0)),
-                ..default()
-            },
-            ..default()
-        }).with_children(|header| {
-            header.spawn(TextBundle::from_section(
-                "Advent Of Code",
-                TextStyle {
-                    font: asset_server.load("fonts/runescape_uf.ttf"),
-                    font_size: 40.0,
-                    color: Color::rgb(0.9, 0.9, 0.9),
-                },
-            ));
-        });
-
-        body.spawn(NodeBundle {
-            style: Style {
-                justify_content: JustifyContent::Center,
+                size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
                 flex_direction: FlexDirection::Column,
-                margin: UiRect::all(Val::Auto),
-                size: Size::new(Val::Auto, Val::Auto),
                 ..default()
             },
             ..default()
-        }).with_children(|content| {
-            content.spawn(TextBundle::from_section(
-                format!("Part 1: {}", part1()),
-                TextStyle {
-                    font: asset_server.load("fonts/runescape_uf.ttf"),
-                    font_size: 40.0,
-                    color: Color::rgb(0.9, 0.9, 0.9),
+        })
+        .with_children(|body| {
+            body.spawn(NodeBundle {
+                style: Style {
+                    justify_content: JustifyContent::Center,
+                    size: Size::new(Val::Auto, Val::Px(30.0)),
+                    ..default()
                 },
-            ));
+                ..default()
+            })
+            .with_children(|header| {
+                header.spawn(TextBundle::from_section(
+                    "Advent Of Code",
+                    TextStyle {
+                        font: asset_server.load("fonts/runescape_uf.ttf"),
+                        font_size: 40.0,
+                        color: Color::rgb(0.9, 0.9, 0.9),
+                    },
+                ));
+            });
 
-            content.spawn(TextBundle::from_section(
-                format!("Part 2: {}", part2()),
-                TextStyle {
-                    font: asset_server.load("fonts/runescape_uf.ttf"),
-                    font_size: 40.0,
-                    color: Color::rgb(0.9, 0.9, 0.9),
+            body.spawn(NodeBundle {
+                style: Style {
+                    justify_content: JustifyContent::Center,
+                    flex_direction: FlexDirection::Column,
+                    margin: UiRect::all(Val::Auto),
+                    size: Size::new(Val::Auto, Val::Auto),
+                    ..default()
                 },
-            ));
+                ..default()
+            })
+            .with_children(|content| {
+                content.spawn(TextBundle::from_section(
+                    format!("Part 1: {}", part1()),
+                    TextStyle {
+                        font: asset_server.load("fonts/runescape_uf.ttf"),
+                        font_size: 40.0,
+                        color: Color::rgb(0.9, 0.9, 0.9),
+                    },
+                ));
+
+                content.spawn(TextBundle::from_section(
+                    format!("Part 2: {}", part2()),
+                    TextStyle {
+                        font: asset_server.load("fonts/runescape_uf.ttf"),
+                        font_size: 40.0,
+                        color: Color::rgb(0.9, 0.9, 0.9),
+                    },
+                ));
+            });
         });
-    });
 }
 
-fn cleanup_day1(mut commands: Commands, button_query: Query<Entity, With<Button>>) {
-    for ent in button_query.iter() {
-        commands.entity(ent).despawn_recursive();
+fn cleanup_day1(mut commands: Commands, node_query: Query<Entity, With<Node>>) {
+    for ent in node_query.iter() {
+        commands.entity(ent).despawn_descendants();
     }
 }
 

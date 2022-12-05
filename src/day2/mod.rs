@@ -1,8 +1,8 @@
 use self::Play::{PAPER, ROCK, SCISSORS};
 use std::str::FromStr;
 
-use bevy::prelude::*;
 use crate::GameState;
+use bevy::prelude::*;
 
 pub struct Day2Plugin;
 
@@ -31,75 +31,77 @@ fn day(
             Interaction::Clicked => {
                 state.set(GameState::Menu).unwrap();
             }
-            Interaction::Hovered => {
-            }
-            Interaction::None => {
-            }
+            Interaction::Hovered => {}
+            Interaction::None => {}
         }
     }
 }
 
 fn setup_day(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn(NodeBundle {
-        style: Style {
-            size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
-            flex_direction: FlexDirection::Column,
-            ..default()
-        },
-        ..default()
-    }).with_children(|body| {
-        body.spawn(NodeBundle {
+    commands
+        .spawn(NodeBundle {
             style: Style {
-                justify_content: JustifyContent::Center,
-                size: Size::new(Val::Auto, Val::Px(30.0)),
-                ..default()
-            },
-            ..default()
-        }).with_children(|header| {
-            header.spawn(TextBundle::from_section(
-                "Advent Of Code: Day 2",
-                TextStyle {
-                    font: asset_server.load("fonts/runescape_uf.ttf"),
-                    font_size: 40.0,
-                    color: Color::rgb(0.9, 0.9, 0.9),
-                },
-            ));
-        });
-
-        body.spawn(NodeBundle {
-            style: Style {
-                justify_content: JustifyContent::Center,
+                size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
                 flex_direction: FlexDirection::Column,
-                margin: UiRect::all(Val::Auto),
-                size: Size::new(Val::Auto, Val::Auto),
                 ..default()
             },
             ..default()
-        }).with_children(|content| {
-            content.spawn(TextBundle::from_section(
-                format!("Part 1: {}", part1()),
-                TextStyle {
-                    font: asset_server.load("fonts/runescape_uf.ttf"),
-                    font_size: 40.0,
-                    color: Color::rgb(0.9, 0.9, 0.9),
+        })
+        .with_children(|body| {
+            body.spawn(NodeBundle {
+                style: Style {
+                    justify_content: JustifyContent::Center,
+                    size: Size::new(Val::Auto, Val::Px(30.0)),
+                    ..default()
                 },
-            ));
+                ..default()
+            })
+            .with_children(|header| {
+                header.spawn(TextBundle::from_section(
+                    "Advent Of Code: Day 2",
+                    TextStyle {
+                        font: asset_server.load("fonts/runescape_uf.ttf"),
+                        font_size: 40.0,
+                        color: Color::rgb(0.9, 0.9, 0.9),
+                    },
+                ));
+            });
 
-            content.spawn(TextBundle::from_section(
-                format!("Part 2: {}", part2()),
-                TextStyle {
-                    font: asset_server.load("fonts/runescape_uf.ttf"),
-                    font_size: 40.0,
-                    color: Color::rgb(0.9, 0.9, 0.9),
+            body.spawn(NodeBundle {
+                style: Style {
+                    justify_content: JustifyContent::Center,
+                    flex_direction: FlexDirection::Column,
+                    margin: UiRect::all(Val::Auto),
+                    size: Size::new(Val::Auto, Val::Auto),
+                    ..default()
                 },
-            ));
+                ..default()
+            })
+            .with_children(|content| {
+                content.spawn(TextBundle::from_section(
+                    format!("Part 1: {}", part1()),
+                    TextStyle {
+                        font: asset_server.load("fonts/runescape_uf.ttf"),
+                        font_size: 40.0,
+                        color: Color::rgb(0.9, 0.9, 0.9),
+                    },
+                ));
+
+                content.spawn(TextBundle::from_section(
+                    format!("Part 2: {}", part2()),
+                    TextStyle {
+                        font: asset_server.load("fonts/runescape_uf.ttf"),
+                        font_size: 40.0,
+                        color: Color::rgb(0.9, 0.9, 0.9),
+                    },
+                ));
+            });
         });
-    });
 }
 
-fn cleanup_day(mut commands: Commands, button_query: Query<Entity, With<Button>>) {
-    for ent in button_query.iter() {
-        commands.entity(ent).despawn_recursive();
+fn cleanup_day(mut commands: Commands, node_query: Query<Entity, With<Node>>) {
+    for ent in node_query.iter() {
+        commands.entity(ent).despawn_descendants();
     }
 }
 
@@ -218,13 +220,15 @@ pub fn part2() -> i32 {
     let input = super::files::read_lines("src/day2/input.txt");
     let rows: Vec<Vec<Play2>> = input
         .iter()
-        .map(|row| row.split(' ').map(|s| Play2::from_str(s).unwrap()).collect())
+        .map(|row| {
+            row.split(' ')
+                .map(|s| Play2::from_str(s).unwrap())
+                .collect()
+        })
         .collect();
 
     rows.iter().map(|row| calculate_score_2(row)).sum()
 }
-
-
 
 fn find_play<'a>(their_play: &'a Play2, desired_result: &'a Play2) -> &'a Play2 {
     match desired_result {

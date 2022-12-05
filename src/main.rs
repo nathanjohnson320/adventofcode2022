@@ -1,12 +1,12 @@
-mod menu;
-mod files;
 mod day1;
 mod day2;
 mod day3;
 mod day4;
+mod files;
+mod menu;
 
 use bevy::{prelude::*, winit::WinitSettings};
-
+// use bevy_inspector_egui::WorldInspectorPlugin;
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub enum GameState {
@@ -47,9 +47,11 @@ fn main() {
             },
             ..default()
         }))
+        // .add_plugin(WorldInspectorPlugin::new())
         .add_startup_system(spawn_camera)
         .add_state(GameState::Menu)
         .insert_resource(WinitSettings::desktop_app())
+        .add_system(escape_system)
         .add_plugin(menu::MainMenuPlugin)
         .add_plugin(day1::Day1Plugin)
         .add_plugin(day2::Day2Plugin)
@@ -60,4 +62,11 @@ fn main() {
 
 fn spawn_camera(mut commands: Commands) {
     commands.spawn(Camera2dBundle::default());
+}
+
+fn escape_system(mut keys: ResMut<Input<KeyCode>>, mut state: ResMut<State<GameState>>) {
+    if keys.just_pressed(KeyCode::Escape) && *state.current() != GameState::Menu {
+        state.set(GameState::Menu).unwrap();
+        keys.clear();
+    }
 }
