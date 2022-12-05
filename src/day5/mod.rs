@@ -1,55 +1,14 @@
 use crate::GameState;
 use bevy::prelude::*;
+use regex::Regex;
+use std::collections::VecDeque;
 
 pub struct Day5Plugin;
-
-#[derive(Component)]
-pub struct ControlledText;
 
 impl Plugin for Day5Plugin {
     fn build(&self, app: &mut App) {
         app.add_system_set(SystemSet::on_enter(GameState::Day5).with_system(setup_day))
-            .add_system_set(SystemSet::on_update(GameState::Day5).with_system(day))
-            .add_system_set(SystemSet::on_update(GameState::Day5).with_system(keyboard))
             .add_system_set(SystemSet::on_exit(GameState::Day5).with_system(cleanup_day));
-    }
-}
-
-fn day(
-    mut interaction_query: Query<
-        (&Interaction, &mut BackgroundColor, &Children),
-        (Changed<Interaction>, With<Button>),
-    >,
-    mut text_query: Query<&mut Text>,
-    mut state: ResMut<State<GameState>>,
-) {
-    for (interaction, _color, children) in &mut interaction_query {
-        let _text = text_query.get_mut(children[0]).unwrap();
-        match *interaction {
-            Interaction::Clicked => {
-                state.set(GameState::Menu).unwrap();
-            }
-            Interaction::Hovered => {}
-            Interaction::None => {}
-        }
-    }
-}
-
-fn keyboard(
-    keyboard_input: Res<Input<KeyCode>>,
-    mut query: Query<&mut Text, With<ControlledText>>,
-) {
-    for mut text in &mut query {
-        if keyboard_input.pressed(KeyCode::W) {
-            let color = text.sections[0].style.color;
-            text.sections[0].style.color =
-                Color::rgb(color.r() + 0.1, color.g() + 0.1, color.b() + 0.1);
-        }
-        if keyboard_input.pressed(KeyCode::S) {
-            let color = text.sections[0].style.color;
-            text.sections[0].style.color =
-                Color::rgb(color.r() - 0.1, color.g() - 0.1, color.b() - 0.1);
-        }
     }
 }
 
@@ -104,17 +63,14 @@ fn setup_day(mut commands: Commands, asset_server: Res<AssetServer>) {
                     },
                 ));
 
-                content.spawn((
-                    TextBundle::from_section(
-                        format!("Part 2: {}", part2()),
-                        TextStyle {
-                            font: asset_server.load("fonts/runescape_uf.ttf"),
-                            font_size: 40.0,
-                            color: Color::rgb(0.9, 0.9, 0.9),
-                            ..default()
-                        },
-                    ),
-                    ControlledText,
+                content.spawn(TextBundle::from_section(
+                    format!("Part 2: {}", part2()),
+                    TextStyle {
+                        font: asset_server.load("fonts/runescape_uf.ttf"),
+                        font_size: 40.0,
+                        color: Color::rgb(0.9, 0.9, 0.9),
+                        ..default()
+                    },
                 ));
             });
         });
@@ -126,21 +82,113 @@ fn cleanup_day(mut commands: Commands, node_query: Query<Entity, With<Node>>) {
     }
 }
 
-fn part1() -> i32 {
-    let crates = [
-        Vec::from(['Z', 'N']),
-        Vec::from(['M', 'C', 'D']),
-        Vec::from(['P'])
-    ];
+fn part1() -> String {
+    // Test queues
+    // VecDeque::from(['Z', 'N']),
+    // VecDeque::from(['M', 'C', 'D']),
+    // VecDeque::from(['P']),
 
-    let data = super::files::read_lines("src/day5/test.txt");
+    //         [G]         [D]     [Q]
+    // [P]     [T]         [L] [M] [Z]
+    // [Z] [Z] [C]         [Z] [G] [W]
+    // [M] [B] [F]         [P] [C] [H] [N]
+    // [T] [S] [R]     [H] [W] [R] [L] [W]
+    // [R] [T] [Q] [Z] [R] [S] [Z] [F] [P]
+    // [C] [N] [H] [R] [N] [H] [D] [J] [Q]
+    // [N] [D] [M] [G] [Z] [F] [W] [S] [S]
+    let mut crates: Vec<VecDeque<char>> = Vec::from([
+        VecDeque::from(['N', 'C', 'R', 'T', 'M', 'Z', 'P']),
+        VecDeque::from(['D', 'N', 'T', 'S', 'B', 'Z']),
+        VecDeque::from(['M', 'H', 'Q', 'R', 'F', 'C', 'T', 'G']),
+        VecDeque::from(['G', 'R', 'Z']),
+        VecDeque::from(['Z', 'N', 'R', 'H']),
+        VecDeque::from(['F', 'H', 'S', 'W', 'P', 'Z', 'L', 'D']),
+        VecDeque::from(['W', 'D', 'Z', 'R', 'C', 'G', 'M']),
+        VecDeque::from(['S', 'J', 'F', 'L', 'H', 'W', 'Z', 'Q']),
+        VecDeque::from(['S', 'Q', 'P', 'W', 'N']),
+    ]);
+
+    let data: Vec<String> = super::files::read_lines("src/day5/input.txt");
+    let re: Regex = Regex::new(r"move (\d+) from (\d+) to (\d+)").unwrap();
 
     for row in data {
+        let caps = re.captures(row.as_str()).unwrap();
+        let total: usize = caps
+            .get(1)
+            .map_or(0, |m| m.as_str().parse::<usize>().unwrap());
+        let from: usize = caps
+            .get(2)
+            .map_or(0, |m| m.as_str().parse::<usize>().unwrap());
+        let to: usize = caps
+            .get(3)
+            .map_or(0, |m| m.as_str().parse::<usize>().unwrap());
+
+        for _i in 0..total {
+            let popped = crates.get_mut(from - 1).unwrap().pop_back().unwrap();
+            crates.get_mut(to - 1).unwrap().push_back(popped);
+        }
     }
 
-    0
+    let code: String = crates.iter().map(|stack| stack.back().unwrap()).collect();
+
+    code
 }
 
-fn part2() -> i32 {
-    0
+fn part2() -> String {
+    // Test queues
+    // let mut crates: Vec<VecDeque<char>> = Vec::from([
+    //     VecDeque::from(['Z', 'N']),
+    //     VecDeque::from(['M', 'C', 'D']),
+    //     VecDeque::from(['P']),
+    // ]);
+
+    //         [G]         [D]     [Q]
+    // [P]     [T]         [L] [M] [Z]
+    // [Z] [Z] [C]         [Z] [G] [W]
+    // [M] [B] [F]         [P] [C] [H] [N]
+    // [T] [S] [R]     [H] [W] [R] [L] [W]
+    // [R] [T] [Q] [Z] [R] [S] [Z] [F] [P]
+    // [C] [N] [H] [R] [N] [H] [D] [J] [Q]
+    // [N] [D] [M] [G] [Z] [F] [W] [S] [S]
+    let mut crates: Vec<VecDeque<char>> = Vec::from([
+        VecDeque::from(['N', 'C', 'R', 'T', 'M', 'Z', 'P']),
+        VecDeque::from(['D', 'N', 'T', 'S', 'B', 'Z']),
+        VecDeque::from(['M', 'H', 'Q', 'R', 'F', 'C', 'T', 'G']),
+        VecDeque::from(['G', 'R', 'Z']),
+        VecDeque::from(['Z', 'N', 'R', 'H']),
+        VecDeque::from(['F', 'H', 'S', 'W', 'P', 'Z', 'L', 'D']),
+        VecDeque::from(['W', 'D', 'Z', 'R', 'C', 'G', 'M']),
+        VecDeque::from(['S', 'J', 'F', 'L', 'H', 'W', 'Z', 'Q']),
+        VecDeque::from(['S', 'Q', 'P', 'W', 'N']),
+    ]);
+
+    let data: Vec<String> = super::files::read_lines("src/day5/input.txt");
+    let re: Regex = Regex::new(r"move (\d+) from (\d+) to (\d+)").unwrap();
+
+    for row in data {
+        let caps = re.captures(row.as_str()).unwrap();
+        let total: usize = caps
+            .get(1)
+            .map_or(0, |m| m.as_str().parse::<usize>().unwrap());
+        let from: usize = caps
+            .get(2)
+            .map_or(0, |m| m.as_str().parse::<usize>().unwrap());
+        let to: usize = caps
+            .get(3)
+            .map_or(0, |m| m.as_str().parse::<usize>().unwrap());
+
+        let mut stack: Vec<char> = (0..total)
+            .map(|_i| crates.get_mut(from - 1).unwrap().pop_back().unwrap())
+            .collect();
+
+        stack.reverse();
+
+        for char in stack {
+            crates.get_mut(to - 1).unwrap().push_back(char);
+        }
+    }
+
+    let code: String = crates.iter().map(|stack| stack.back().unwrap()).collect();
+
+    code
 }
