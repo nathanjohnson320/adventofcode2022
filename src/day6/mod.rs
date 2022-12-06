@@ -105,11 +105,11 @@ fn part2() -> usize {
     let chars: Vec<char> = input.chars().collect();
     for i in 0..chars.len() {
         if i > 13 && i + 14 < input.len() {
-            let chars = &chars[i-13..i];
+            let chars = &chars[i - 14..i];
             let unique_chars: HashSet<char> = HashSet::from_iter(chars.iter().cloned());
-            println!("{:?}", unique_chars);
+            println!("{:?}, {}", unique_chars, unique_chars.len());
             if unique_chars.len() == 14 {
-                return i + 1;
+                return i;
             }
         }
     }
