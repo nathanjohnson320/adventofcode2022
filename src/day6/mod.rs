@@ -86,15 +86,13 @@ fn part1() -> usize {
     let input = data.first().unwrap();
 
     let chars: Vec<char> = input.chars().collect();
-    for i in 0..chars.len() {
-        if i > 3 && i + 4 < input.len() {
-            let unique_chars = HashSet::from([chars[i], chars[i - 1], chars[i - 2], chars[i - 3]]);
-            if unique_chars.len() == 4 {
-                return i + 1;
-            }
+    for i in 4..chars.len() {
+        let chars = &chars[i - 4..i];
+        let unique_chars: HashSet<char> = HashSet::from_iter(chars.iter().cloned());
+        if unique_chars.len() == 4 {
+            return i;
         }
     }
-
     0
 }
 
@@ -103,14 +101,11 @@ fn part2() -> usize {
     let input = data.first().unwrap();
 
     let chars: Vec<char> = input.chars().collect();
-    for i in 0..chars.len() {
-        if i > 13 && i + 14 < input.len() {
-            let chars = &chars[i - 14..i];
-            let unique_chars: HashSet<char> = HashSet::from_iter(chars.iter().cloned());
-            println!("{:?}, {}", unique_chars, unique_chars.len());
-            if unique_chars.len() == 14 {
-                return i;
-            }
+    for i in 14..chars.len() {
+        let chars = &chars[i - 14..i];
+        let unique_chars: HashSet<char> = HashSet::from_iter(chars.iter().cloned());
+        if unique_chars.len() == 14 {
+            return i;
         }
     }
 
