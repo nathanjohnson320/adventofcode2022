@@ -11,28 +11,7 @@ impl Plugin for Day4Plugin {
     fn build(&self, app: &mut App) {
         app.add_system_set(SystemSet::on_update(GameState::Day4).with_system(keyboard))
             .add_system_set(SystemSet::on_enter(GameState::Day4).with_system(setup_day))
-            .add_system_set(SystemSet::on_update(GameState::Day4).with_system(day))
             .add_system_set(SystemSet::on_exit(GameState::Day4).with_system(cleanup_day));
-    }
-}
-
-fn day(
-    mut interaction_query: Query<
-        (&Interaction, &mut BackgroundColor, &Children),
-        (Changed<Interaction>, With<Button>),
-    >,
-    mut text_query: Query<&mut Text>,
-    mut state: ResMut<State<GameState>>,
-) {
-    for (interaction, _color, children) in &mut interaction_query {
-        let _text = text_query.get_mut(children[0]).unwrap();
-        match *interaction {
-            Interaction::Clicked => {
-                state.set(GameState::Menu).unwrap();
-            }
-            Interaction::Hovered => {}
-            Interaction::None => {}
-        }
     }
 }
 

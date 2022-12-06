@@ -108,8 +108,6 @@ pub fn part1() -> i64 {
 
     let input = super::files::read_lines("src/day1/input.txt");
 
-    // Could do this in one loop but the next one probably requires
-    // some other transformation so I'm separating them
     for e in input.iter() {
         if e == "" {
             // New elf new vec
