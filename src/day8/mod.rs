@@ -81,24 +81,29 @@ fn cleanup_day(mut commands: Commands, node_query: Query<Entity, With<Node>>) {
 }
 
 fn part1() -> usize {
-    let data: Vec<String> = super::files::read_lines("src/day8/test.txt");
-    let trees: Vec<Vec<usize>> = data
+    let data: Vec<String> = super::files::read_lines("src/day8/input.txt");
+    let trees: Vec<Vec<u32>> = data
         .iter()
-        .map(|row| row.chars().map(|c| c as usize).collect())
+        .map(|row| row.chars().map(|c| c.to_digit(10).unwrap()).collect())
         .collect();
 
-
     let mut visible = 0;
-    for i in 0..trees.len() {
-        for j in 0..trees[i].len() {
-            let height = trees[i][j];
+    for row in 0..trees.len() {
+        for col in 0..trees[row].len() {
+            // Trees on the edge are automatically visible
+            if row == 0 || col == 0 || row == trees.len() - 1 || col == trees[row].len() - 1 {
+                visible += 1;
+                continue;
+            }
 
-            let top = (0..i).all(|k| height > trees[i][k]);
-            let bottom = (0..j).all(|k| height > trees[i][k]);
-            let left = (0..j).all(|k| height > trees[i][k]);
-            let right = (0..i).all(|k| height > trees[i][k]);
+            let height = trees[row][col];
 
-            if top && bottom && left && right {
+            let top = (0..row).all(|k| height > trees[k][col]);
+            let bottom = (row + 1..trees.len()).all(|k| height > trees[k][col]);
+            let left = (0..col).all(|k| height > trees[row][k]);
+            let right = (col + 1..trees.len()).all(|k| height > trees[row][k]);
+
+            if top || bottom || left || right {
                 visible += 1;
             }
         }
@@ -108,5 +113,59 @@ fn part1() -> usize {
 }
 
 fn part2() -> usize {
-    0
+    let data: Vec<String> = super::files::read_lines("src/day8/input.txt");
+    let trees: Vec<Vec<u32>> = data
+        .iter()
+        .map(|row| row.chars().map(|c| c.to_digit(10).unwrap()).collect())
+        .collect();
+
+    let mut highest_score = 0;
+    for row in 0..trees.len() {
+        for col in 0..trees[row].len() {
+            if row == 0 || col == 0 || row == trees.len() - 1 || col == trees[row].len() - 1 {
+                continue;
+            }
+
+            let height = trees[row][col];
+
+            let mut top = 0;
+            for k in (0..row).rev() {
+                top += 1;
+                if height <= trees[k][col] {
+                    break;
+                }
+            }
+
+            let mut bottom = 0;
+            for k in row + 1..trees.len() {
+                bottom += 1;
+                if height <= trees[k][col] {
+                    break;
+                }
+            }
+
+            let mut left = 0;
+            for k in (0..col).rev() {
+                left += 1;
+                if height <= trees[row][k] {
+                    break;
+                }
+            }
+
+            let mut right = 0;
+            for k in col + 1..trees.len() {
+                right += 1;
+                if height <= trees[row][k] {
+                    break;
+                }
+            }
+
+            let scenic_score = top * bottom * left * right;
+            if scenic_score > highest_score {
+                highest_score = scenic_score;
+            }
+        }
+    }
+
+    highest_score
 }
