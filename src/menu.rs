@@ -1,5 +1,7 @@
+use crate::audio::{AudioState, BackgroundMusic};
 use crate::GameState;
 use bevy::prelude::*;
+use bevy_kira_audio::prelude::*;
 
 pub struct MainMenuPlugin;
 
@@ -7,14 +9,27 @@ impl Plugin for MainMenuPlugin {
     fn build(&self, app: &mut App) {
         app.add_system_set(SystemSet::on_enter(GameState::Menu).with_system(setup_menu))
             .add_system_set(SystemSet::on_update(GameState::Menu).with_system(menu))
-            .add_system_set(SystemSet::on_exit(GameState::Menu).with_system(cleanup_menu));
+            .add_system_set(SystemSet::on_exit(GameState::Menu).with_system(cleanup_menu))
+            .add_system_set(SystemSet::on_enter(GameState::Menu).with_system(start_bgm))
+            .add_system_set(
+                SystemSet::on_resume(GameState::Menu).with_system(resume_bgm),
+            );
     }
 }
 
-fn cleanup_menu(mut commands: Commands, node_query: Query<Entity, With<Node>>) {
+fn start_bgm(bg_audio: Res<AudioChannel<BackgroundMusic>>, audio_state: Res<AudioState>) {
+    bg_audio.play(audio_state.bgm_handle.clone()).looped();
+}
+
+fn cleanup_menu(mut commands: Commands, node_query: Query<Entity, With<Node>>, bg_audio: Res<AudioChannel<BackgroundMusic>>) {
+    bg_audio.stop();
     for ent in node_query.iter() {
         commands.entity(ent).despawn_descendants();
     }
+}
+
+fn resume_bgm(bg_audio: Res<AudioChannel<BackgroundMusic>>) {
+    bg_audio.resume();
 }
 
 const NORMAL_BUTTON: Color = Color::rgb(0.15, 0.15, 0.15);

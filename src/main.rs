@@ -8,8 +8,10 @@ mod day7;
 mod day8;
 mod files;
 mod menu;
+mod audio;
 
 use bevy::{prelude::*, winit::WinitSettings};
+use bevy_kira_audio::prelude::*;
 // use bevy_inspector_egui::WorldInspectorPlugin;
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
@@ -51,11 +53,13 @@ fn main() {
             },
             ..default()
         }))
+        .add_plugin(AudioPlugin)
         // .add_plugin(WorldInspectorPlugin::new())
         .add_startup_system(spawn_camera)
         .add_state(GameState::Menu)
         .insert_resource(WinitSettings::desktop_app())
         .add_system(escape_system)
+        .add_plugin(audio::AudioPlugin)
         .add_plugin(menu::MainMenuPlugin)
         .add_plugin(day1::Day1Plugin)
         .add_plugin(day2::Day2Plugin)
