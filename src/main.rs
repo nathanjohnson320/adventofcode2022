@@ -7,6 +7,7 @@ mod day6;
 mod day7;
 mod day8;
 mod day9;
+mod day10;
 mod files;
 mod menu;
 mod audio;
@@ -71,6 +72,7 @@ fn main() {
         .add_plugin(day7::Day7Plugin)
         .add_plugin(day8::Day8Plugin)
         .add_plugin(day9::Day9Plugin)
+        .add_plugin(day10::Day10Plugin)
         .run();
 }
 
